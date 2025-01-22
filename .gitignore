@@ -1,0 +1,15 @@
+# Frontend
+frontend/node_modules
+frontend/.next
+frontend/out
+
+# Backend
+/gitwatcher
+cmd/gitwatcher/web
+
+# IDE
+.idea
+.vscode
+
+# OS
+.DS_Store

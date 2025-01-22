@@ -1,0 +1,125 @@
+{{define "home"}}
+<div class="card">
+    <h2>Add Repository</h2>
+    <form id="addRepoForm" onsubmit="return handleAddRepository(event)">
+        <div class="form-group">
+            <label class="label" for="repoPath">Repository Path</label>
+            <input type="text" id="repoPath" name="path" class="input" required>
+        </div>
+        <div class="form-group">
+            <label class="label" for="schedule">Schedule (cron format)</label>
+            <input type="text" id="schedule" name="schedule" class="input" value="0 * * * *" required>
+        </div>
+        <button type="submit" class="button">Add Repository</button>
+    </form>
+</div>
+
+<div id="repositories">
+    {{if .Repositories}}
+        {{range $path, $repo := .Repositories}}
+        <div class="card">
+            <h3>{{$path}}</h3>
+            <p>Schedule: <span class="chip">{{$repo.Schedule}}</span></p>
+            {{if $repo.Status}}
+                <p>Branch: <span class="chip {{if $repo.Status.HasChanges}}warning{{else}}success{{end}}">
+                    {{$repo.Status.CurrentBranch}}
+                </span></p>
+                {{if $repo.Status.HasChanges}}
+                    <p>Changed files: {{range $repo.Status.ChangedFiles}}{{.}} {{end}}</p>
+                {{end}}
+            {{end}}
+            <p>Last Sync: {{$repo.LastSync}}</p>
+            <button onclick="handleUpdateRepo('{{$path}}')" class="button">Update</button>
+            <button onclick="handleCommit('{{$path}}')" class="button" {{if not $repo.Status.HasChanges}}disabled{{end}}>Commit</button>
+            <button onclick="handlePush('{{$path}}')" class="button">Push</button>
+            <button onclick="handleCreatePR('{{$path}}')" class="button">Create PR</button>
+        </div>
+        {{end}}
+    {{else}}
+        <div class="card">
+            <p>No repositories added yet. Add one using the form above.</p>
+        </div>
+    {{end}}
+</div>
+
+<script>
+async function handleAddRepository(event) {
+    event.preventDefault();
+    const form = event.target;
+    const data = {
+        path: form.path.value,
+        schedule: form.schedule.value
+    };
+
+    try {
+        const response = await fetch('/api/repositories', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) throw new Error(await response.text());
+        window.location.reload();
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+    return false;
+}
+
+async function handleUpdateRepo(path) {
+    try {
+        const response = await fetch('/api/repositories/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path })
+        });
+        if (!response.ok) throw new Error(await response.text());
+        window.location.reload();
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
+async function handleCommit(path) {
+    try {
+        const response = await fetch('/api/repositories/commit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path })
+        });
+        if (!response.ok) throw new Error(await response.text());
+        window.location.reload();
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
+async function handlePush(path) {
+    try {
+        const response = await fetch('/api/repositories/push', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path })
+        });
+        if (!response.ok) throw new Error(await response.text());
+        window.location.reload();
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
+async function handleCreatePR(path) {
+    try {
+        const response = await fetch('/api/repositories/pr', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path })
+        });
+        if (!response.ok) throw new Error(await response.text());
+        window.location.reload();
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+</script>
+{{end}}

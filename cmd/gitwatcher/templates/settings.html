@@ -1,0 +1,41 @@
+{{define "settings"}}
+<div class="card">
+    <h2>Settings</h2>
+    <form id="settingsForm" onsubmit="return handleUpdateSettings(event)">
+        <div class="form-group">
+            <label class="label" for="ollamaServer">Ollama Server</label>
+            <input type="text" id="ollamaServer" name="ollamaServer" class="input" value="{{.Settings.OllamaServer}}" required>
+        </div>
+        <div class="form-group">
+            <label class="label" for="ollamaModel">Ollama Model</label>
+            <input type="text" id="ollamaModel" name="ollamaModel" class="input" value="{{.Settings.OllamaModel}}" required>
+        </div>
+        <button type="submit" class="button">Save Settings</button>
+    </form>
+</div>
+
+<script>
+async function handleUpdateSettings(event) {
+    event.preventDefault();
+    const form = event.target;
+    const data = {
+        ollamaServer: form.ollamaServer.value,
+        ollamaModel: form.ollamaModel.value
+    };
+
+    try {
+        const response = await fetch('/api/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) throw new Error(await response.text());
+        alert('Settings saved successfully');
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+    return false;
+}
+</script>
+{{end}}
