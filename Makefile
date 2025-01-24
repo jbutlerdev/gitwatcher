@@ -5,7 +5,6 @@ all: clean build
 
 # Clean build artifacts
 clean:
-	rm -rf cmd/gitwatcher/web
 	rm -f gitwatcher
 
 # Build backend
